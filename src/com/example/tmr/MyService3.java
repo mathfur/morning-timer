@@ -17,10 +17,15 @@ public class MyService3 extends IntentService {
         Log.d(TAG,"MyService3()");
     }
 
-  @Override
-  protected void onHandleIntent(Intent intent) {
-    Log.d(TAG, "timer was expired.");
-    TimerActivity.after_timeout = true;
-    TimerActivity.mRingtone.play();
+    @Override
+    protected void onHandleIntent(Intent intent) {
+      Log.d(TAG, "timer was expired.");
+      if(TimerActivity.state == State.BEFORE_RING){
+          TimerActivity.mRingtone.play();
+          TimerActivity.state = State.AFTER_RING;
+      }else if(TimerActivity.state ==  State.SHOWER){
+          TimerActivity.state = State.TIMEOUT_COMPLETE;
+          // TODO: 時間切れを示すメッセージを表示
+      }
+    }
   }
-}

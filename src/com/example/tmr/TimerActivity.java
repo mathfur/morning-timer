@@ -22,7 +22,10 @@ import android.widget.RadioGroup;
 public class TimerActivity extends Activity implements OnClickListener {
     static MediaPlayer mp = new MediaPlayer();
     static Ringtone mRingtone;
-    static boolean after_timeout = false;
+
+    static State state = State.BEFORE_START;
+
+    final static String TAG = "TimerActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,42 +42,70 @@ public class TimerActivity extends Activity implements OnClickListener {
     }
 
     public void onClick(View v){
-        Log.d("TimerActivity", "onClick()");
+        Log.d(TAG, "onClick()");
         switch(v.getId()){
         case R.id.button1:
+            state = State.BEFORE_RING;
             // 通常はラジオボタンで選択した秒数待つ
             startTimer(0);
             break;
         case R.id.button2:
+            if(state != State.BEFORE_RING){
+                Log.d(TAG, "The state must be BEFORE_RING when button2 is clicked.");
+                break;
+            }
             if(checkCodeIsOK()){
                 stopTimer();
+                state = State.SHOWER;
+                startTimer(20*60*1000);
+                // TODO: 「間違えたパスです」消す
+            }else{
+                // TODO: 「間違えたパスです」表示
             }
             break;
+        case R.id.button3:
+            // to complete
+            if(state != State.SHOWER){
+                Log.d(TAG, "The state must be SHOWER when button3 is clicked.");
+                break;
+            }
+            if(state != State.TIMEOUT_COMPLETE){
+                state = State.COMPLETE;
+            }
+            break;
+        case R.id.button4:
+            // temporary stop.
+            if(state != State.AFTER_RING){
+                Log.d(TAG, "The state must be AFTER_RING when button3 is clicked.");
+                break;
+            }
+            state = State.BEFORE_RING;
+            stopTimer();
+            startTimer(15*60*1000);
+            break;
         default:
-            // もしすでにタイムアウトした状態で、再度ボタンを押すと
-            // 5分後にアラームを鳴らすようにする。
         }
     }
 
     // If wait_time is 0, then radio button value is used.
     protected void startTimer(int wait_time){
-        Log.d("TimerActivity", "startTimer()");
+        Log.d(TAG, "startTimer()");
 
         if(wait_time == 0){
             RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
             switch(radioGroup.getCheckedRadioButtonId()){
             case R.id.radioButton1:
-                Log.d("TimerActivity", "radioButton1 is selected.");
+                Log.d(TAG, "radioButton1 is selected.");
                 // alerm_start_time = 5*60*60*1000;
                 wait_time = 2000;
                 break;
             case R.id.radioButton2:
-                Log.d("TimerActivity", "radioButton2 is selected.");
+                Log.d(TAG, "radioButton2 is selected.");
                 // 5:30セット
                 wait_time = (5*60 + 30)*60*1000;
                 break;
             case R.id.radioButton3:
-                Log.d("TimerActivity", "radioButton3 is selected.");
+                Log.d(TAG, "radioButton3 is selected.");
                 // 6:00セット
                 wait_time = 6*60*60*1000;
                 break;
@@ -86,23 +117,20 @@ public class TimerActivity extends Activity implements OnClickListener {
         PendingIntent pendingIntent = PendingIntent.getService(context, -1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager  = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + wait_time, 5*60*1000, pendingIntent);
-        Log.d("TimerActivity","Timer is set.");
+        Log.d(TAG,"Timer is set.");
     }
 
     protected void stopTimer(){
         // どうやって止める?
-        Log.d("TimerActivity","stopTimer()");
+        Log.d(TAG,"stopTimer()");
         mRingtone.stop();
 
-        // The meaning that after_timeout is true is that now is morning.
-        if(after_timeout){
-            startTimer(5*60*1000);
-        }
+
     }
 
     // コードが正か確認する
     protected boolean checkCodeIsOK(){
-        Log.d("TimerActivity","readCode()");
+        Log.d(TAG,"readCode()");
         EditText text = (EditText) findViewById(R.id.editText1);
 
         // とりあえず固定文字列で対応
