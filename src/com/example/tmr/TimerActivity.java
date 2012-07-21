@@ -5,6 +5,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +21,8 @@ import android.widget.RadioGroup;
 
 
 public class TimerActivity extends Activity implements OnClickListener {
+    static MediaPlayer mp = new MediaPlayer();
+    static Ringtone mRingtone;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,9 @@ public class TimerActivity extends Activity implements OnClickListener {
         Button button2 = (Button) findViewById(R.id.button2);
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
+
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        mRingtone = RingtoneManager.getRingtone(getApplicationContext(), uri);
     }
   
     public void onClick(View v){
@@ -81,6 +91,7 @@ public class TimerActivity extends Activity implements OnClickListener {
     protected void stopTimer(){
         // どうやって止める?
         Log.d("TimerActivity","stopTimer()");
+        mRingtone.stop();
     }
 
     // コードが正か確認する
