@@ -10,15 +10,17 @@ import android.util.Log;
 
 public class MyService3 extends IntentService {
 
-  final static String TAG = "MyService3";
+    final static String TAG = "MyService3";
 
-  public MyService3() {
-    super(TAG);
-  }
+    public MyService3() {
+        super(TAG);
+        Log.d(TAG,"MyService3()");
+    }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    Log.d(TAG, "onHandleIntent");
+    Log.d(TAG, "timer was expired.");
+    TimerActivity.after_timeout = true;
     TimerActivity.mRingtone.play();
   }
 }
