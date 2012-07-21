@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 
 
 public class TimerActivity extends Activity implements OnClickListener {
@@ -20,25 +22,77 @@ public class TimerActivity extends Activity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer);
         
-        Button button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(this);
+        Button button1 = (Button) findViewById(R.id.button1);
+        Button button2 = (Button) findViewById(R.id.button2);
+        button1.setOnClickListener(this);
+        button2.setOnClickListener(this);
     }
   
     public void onClick(View v){
-    	Log.d("DEBUG", ">>frt");
-        if(v.getId() == R.id.button1){
-            scheduleService();
+        Log.d("TimerActivity", "onClick()");
+        switch(v.getId()){
+        case R.id.button1:
+            // 通常はラジオボタンで選択した秒数待つ
+            startTimer();
+            break;
+        case R.id.button2:
+            stopTimer();
+            break;
+        default:
+            // もしすでにタイムアウトした状態で、再度ボタンを押すと
+            // 5分後にアラームを鳴らすようにする。
         }
     }
     
-    protected void scheduleService(){
-        Log.d("DEBUG", "scheduleService()");
+    protected void startTimer(){
+        Log.d("TimerActivity", "startTimer()");
+        
+        int alerm_start_time = 0;
+        
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
+        switch(radioGroup.getCheckedRadioButtonId()){
+        case R.id.radioButton1:
+            Log.d("TimerActivity", "radioButton1 is selected.");
+            // 5:00セット
+            // alerm_start_time = 5*60*60*1000;
+            alerm_start_time = 2000;
+            break;
+        case R.id.radioButton2:
+            Log.d("TimerActivity", "radioButton2 is selected.");
+            // 5:30セット
+            alerm_start_time = (5*60 + 30)*60*1000;
+            break;
+        case R.id.radioButton3:
+            Log.d("TimerActivity", "radioButton3 is selected.");
+            // 6:00セット
+            alerm_start_time = 6*60*60*1000;
+            break;
+        }
+
         Context context = getBaseContext();
         Intent intent = new Intent(context, MyService3.class);
         PendingIntent pendingIntent = PendingIntent.getService(
             context, -1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager  = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setInexactRepeating(
-                AlarmManager.RTC, System.currentTimeMillis(), 5000, pendingIntent);
-          }
-      }
+                AlarmManager.RTC, System.currentTimeMillis() + alerm_start_time, 5*60*1000, pendingIntent);
+    }
+
+    protected void stopTimer(){
+        // どうやって止める?
+        Log.d("TimerActivity","stopTimer()");
+    }
+
+    // コードが正か確認する
+    protected boolean readCode(){
+        Log.d("TimerActivity","readCode()");
+        EditText text = (EditText) findViewById(R.id.editText1);
+
+        // とりあえず固定文字列で対応
+        if(text.getText().toString() == "123"){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}

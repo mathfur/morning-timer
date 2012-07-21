@@ -15,5 +15,6 @@ public class MyService3 extends IntentService {
   @Override
   protected void onHandleIntent(Intent intent) {
     Log.d(TAG, "onHandleIntent");
+    // ƒAƒ‰[ƒ€‚ğ–Â‚ç‚·
   }
 }
