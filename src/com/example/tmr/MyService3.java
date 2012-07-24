@@ -19,13 +19,24 @@ public class MyService3 extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-      Log.d(TAG, "timer was expired.");
-      if(TimerActivity.state == State.BEFORE_RING){
-          TimerActivity.mRingtone.play();
-          TimerActivity.state = State.AFTER_RING;
-      }else if(TimerActivity.state ==  State.SHOWER){
-          TimerActivity.state = State.TIMEOUT_COMPLETE;
-          // TODO: 時間切れを示すメッセージを表示
-      }
+        try {
+            Log.d(TAG, "timer was expired.");
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.putExtra("message", "Hello, BroadCast!");
+            broadcastIntent.setAction("MY_ACTION");
+            getBaseContext().sendBroadcast(broadcastIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(TimerActivity.state == State.BEFORE_RING){
+             if(TimerActivity.mRingtone != null){
+                  TimerActivity.mRingtone.play();
+                  TimerActivity.state = State.AFTER_RING;
+              }
+        }else if(TimerActivity.state ==  State.SHOWER){
+              TimerActivity.state = State.TIMEOUT_COMPLETE;
+              // TODO: 時間切れを示すメッセージを表示
+        }
     }
-  }
+}

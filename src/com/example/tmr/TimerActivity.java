@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 public class TimerActivity extends Activity implements OnClickListener {
     static MediaPlayer mp = new MediaPlayer();
@@ -26,6 +28,10 @@ public class TimerActivity extends Activity implements OnClickListener {
     static State state = State.BEFORE_START;
 
     final static String TAG = "TimerActivity";
+
+    Button startButton;
+    IntentFilter intentFilter;
+    MyBroadcastReceiver receiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,13 +45,18 @@ public class TimerActivity extends Activity implements OnClickListener {
 
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         mRingtone = RingtoneManager.getRingtone(getApplicationContext(), uri);
+
+        receiver = new MyBroadcastReceiver();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("MY_ACTION");
+        registerReceiver(receiver,  intentFilter);
     }
 
     public void onClick(View v){
         Log.d(TAG, "onClick()");
         switch(v.getId()){
         case R.id.button1:
-            state = State.BEFORE_RING;
+            changeState(State.BEFORE_RING);
             // 通常はラジオボタンで選択した秒数待つ
             startTimer(0);
             break;
@@ -56,7 +67,7 @@ public class TimerActivity extends Activity implements OnClickListener {
             }
             if(checkCodeIsOK()){
                 stopTimer();
-                state = State.SHOWER;
+                changeState(State.SHOWER);
                 startTimer(20*60*1000);
                 // TODO: 「間違えたパスです」消す
             }else{
@@ -70,7 +81,7 @@ public class TimerActivity extends Activity implements OnClickListener {
                 break;
             }
             if(state != State.TIMEOUT_COMPLETE){
-                state = State.COMPLETE;
+            	changeState(State.COMPLETE);
             }
             break;
         case R.id.button4:
@@ -79,7 +90,7 @@ public class TimerActivity extends Activity implements OnClickListener {
                 Log.d(TAG, "The state must be AFTER_RING when button3 is clicked.");
                 break;
             }
-            state = State.BEFORE_RING;
+            changeState(State.BEFORE_RING);
             stopTimer();
             startTimer(15*60*1000);
             break;
@@ -97,7 +108,7 @@ public class TimerActivity extends Activity implements OnClickListener {
             case R.id.radioButton1:
                 Log.d(TAG, "radioButton1 is selected.");
                 // alerm_start_time = 5*60*60*1000;
-                wait_time = 2000;
+                wait_time = 7000;
                 break;
             case R.id.radioButton2:
                 Log.d(TAG, "radioButton2 is selected.");
@@ -121,11 +132,8 @@ public class TimerActivity extends Activity implements OnClickListener {
     }
 
     protected void stopTimer(){
-        // どうやって止める?
         Log.d(TAG,"stopTimer()");
         mRingtone.stop();
-
-
     }
 
     // コードが正か確認する
@@ -139,5 +147,11 @@ public class TimerActivity extends Activity implements OnClickListener {
         }else{
             return false;
         }
+    }
+
+    public void changeState(State s){
+    	TextView text = (TextView) findViewById(R.id.textView1);
+    	text.setText(s.toString());
+    	state = s;
     }
 }
