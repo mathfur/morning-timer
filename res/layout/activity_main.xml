@@ -4,15 +4,6 @@
     android:layout_height="match_parent"
     tools:context=".TimerActivity" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:padding="@dimen/padding_medium"
-        android:text="@string/hello_world"
-        tools:context=".MainActivity" />
-
     <CheckBox
         android:id="@+id/checkBox1"
         android:layout_width="wrap_content"
@@ -21,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="17dp"
-        android:text="CheckBox" />
+        android:text="@string/checkBox1" />
 
     <CheckBox
         android:id="@+id/checkBox2"
@@ -29,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/checkBox1"
         android:layout_below="@+id/checkBox1"
-        android:text="CheckBox" />
+        android:text="@string/checkBox2" />
 
     <CheckBox
         android:id="@+id/checkBox3"
@@ -37,14 +28,22 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/checkBox2"
         android:layout_below="@+id/checkBox2"
-        android:text="CheckBox" />
+        android:text="@string/checkBox3" />
+    
+    <CheckBox
+        android:id="@+id/checkBox4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/checkBox3"
+        android:layout_below="@+id/checkBox3"
+        android:text="@string/checkBox4" />
 
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/checkBox3"
-        android:layout_below="@+id/checkBox3"
-        android:text="Button" />
+        android:layout_alignLeft="@+id/checkBox4"
+        android:layout_below="@+id/checkBox4"
+        android:text="@string/button_after_check" />
 
 </RelativeLayout>

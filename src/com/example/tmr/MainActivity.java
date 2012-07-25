@@ -27,18 +27,18 @@ public class MainActivity extends Activity implements OnClickListener {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
-    
+
     public void onClick(View v){
         CheckBox c1 = (CheckBox) findViewById(R.id.checkBox1);
         CheckBox c2 = (CheckBox) findViewById(R.id.checkBox2);
         CheckBox c3 = (CheckBox) findViewById(R.id.checkBox3);
+        CheckBox c4 = (CheckBox) findViewById(R.id.checkBox4);
+
         if(v.getId() == R.id.button1){
-            if(c1.isChecked() && c2.isChecked() && c3.isChecked()){
+            if(c1.isChecked() && c2.isChecked() && c3.isChecked() && c4.isChecked()){
                 Intent intent = new Intent(MainActivity.this,TimerActivity.class);
                 startActivity(intent);
             }
         }
     }
-
-    
 }

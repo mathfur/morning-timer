@@ -7,9 +7,16 @@
     <string name="timer_label1">5:00</string>
     <string name="timer_label2">5:30</string>
     <string name="timer_label3">6:00</string>
-    <string name="alerm_start_button">START</string>
-    <string name="alerm_stop">STOP</string>
-    <string name="alerm_stop2">STOP2</string>
+    <string name="alerm_start_button">COUNTDOWN START</string>
+    <string name="alerm_stop">TO SHOWER</string>
+    <string name="alerm_stop2">TO PUT ON</string>
     <string name="alerm_temporary_stop">TEMPORARY STOP</string>
+    <string name="checkBox1">Pocket</string>
+    <string name="checkBox2">Bag</string>
+    <string name="checkBox3">pc</string>
+    <string name="checkBox4">nail, shaver, clothes</string>
+    <string name="button_after_check">OK</string>
+
+
 
 </resources>

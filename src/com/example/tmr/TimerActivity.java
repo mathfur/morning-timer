@@ -3,6 +3,7 @@ package com.example.tmr;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -12,6 +13,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +22,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class TimerActivity extends Activity implements OnClickListener {
     static MediaPlayer mp = new MediaPlayer();
@@ -33,6 +36,9 @@ public class TimerActivity extends Activity implements OnClickListener {
     IntentFilter intentFilter;
     MyBroadcastReceiver receiver;
 
+    Vibrator vibrator;
+    long[] vibrator_pattern = {2000, 500};
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +46,13 @@ public class TimerActivity extends Activity implements OnClickListener {
 
         Button button1 = (Button) findViewById(R.id.button1);
         Button button2 = (Button) findViewById(R.id.button2);
+        Button button3 = (Button) findViewById(R.id.button3);
+        Button button4 = (Button) findViewById(R.id.button4);
+
         button1.setOnClickListener(this);
         button2.setOnClickListener(this);
+        button3.setOnClickListener(this);
+        button4.setOnClickListener(this);
 
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
         mRingtone = RingtoneManager.getRingtone(getApplicationContext(), uri);
@@ -50,6 +61,8 @@ public class TimerActivity extends Activity implements OnClickListener {
         intentFilter = new IntentFilter();
         intentFilter.addAction("MY_ACTION");
         registerReceiver(receiver,  intentFilter);
+
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     }
 
     public void onClick(View v){
@@ -61,17 +74,23 @@ public class TimerActivity extends Activity implements OnClickListener {
             startTimer(0);
             break;
         case R.id.button2:
-            if(state != State.BEFORE_RING){
-                Log.d(TAG, "The state must be BEFORE_RING when button2 is clicked.");
+            if(state != State.AFTER_RING){
+                Log.d(TAG, "The state must be AFTER_RING when button2 is clicked.");
                 break;
             }
+
+            EditText text = (EditText) findViewById(R.id.editText1);
+
             if(checkCodeIsOK()){
+                Log.d(TAG, "code is valid.");
                 stopTimer();
                 changeState(State.SHOWER);
                 startTimer(20*60*1000);
-                // TODO: 「間違えたパスです」消す
+
+                text.setText("OK");
             }else{
-                // TODO: 「間違えたパスです」表示
+                Log.d(TAG,"code is not valid.");
+                text.setText("NG");
             }
             break;
         case R.id.button3:
@@ -81,18 +100,19 @@ public class TimerActivity extends Activity implements OnClickListener {
                 break;
             }
             if(state != State.TIMEOUT_COMPLETE){
-            	changeState(State.COMPLETE);
+                changeState(State.COMPLETE);
             }
+            Log.d(TAG,"State is changed to COMPLETE.");
             break;
         case R.id.button4:
             // temporary stop.
             if(state != State.AFTER_RING){
-                Log.d(TAG, "The state must be AFTER_RING when button3 is clicked.");
+                Log.d(TAG, "The state must be AFTER_RING when button4 is clicked.");
                 break;
             }
-            changeState(State.BEFORE_RING);
             stopTimer();
-            startTimer(15*60*1000);
+            startTimer(10*1000);
+            Log.d(TAG,"Timer is stopped temporarily.");
             break;
         default:
         }
@@ -107,8 +127,8 @@ public class TimerActivity extends Activity implements OnClickListener {
             switch(radioGroup.getCheckedRadioButtonId()){
             case R.id.radioButton1:
                 Log.d(TAG, "radioButton1 is selected.");
-                // alerm_start_time = 5*60*60*1000;
-                wait_time = 7000;
+                wait_time = 5*60*60*1000;
+                // wait_time = 7000;
                 break;
             case R.id.radioButton2:
                 Log.d(TAG, "radioButton2 is selected.");
@@ -131,9 +151,22 @@ public class TimerActivity extends Activity implements OnClickListener {
         Log.d(TAG,"Timer is set.");
     }
 
+    protected void expireTimer(){
+        Log.d(TAG,"expireTimer()");
+
+        if(state == State.BEFORE_RING || state == State.AFTER_RING){
+             mRingtone.play();
+             changeState(State.AFTER_RING);
+             vibrator.vibrate(vibrator_pattern,0);
+        }else if(TimerActivity.state ==  State.SHOWER){
+             TimerActivity.state = State.TIMEOUT_COMPLETE;
+        }
+    }
+
     protected void stopTimer(){
         Log.d(TAG,"stopTimer()");
         mRingtone.stop();
+        vibrator.cancel();
     }
 
     // コードが正か確認する
@@ -141,8 +174,10 @@ public class TimerActivity extends Activity implements OnClickListener {
         Log.d(TAG,"readCode()");
         EditText text = (EditText) findViewById(R.id.editText1);
 
+        Log.d(TAG, "getText() is " + text.getText().toString());
+
         // とりあえず固定文字列で対応
-        if(text.getText().toString() == "123"){
+        if(text.getText().toString().equals("0jj2nbdcw")){
             return true;
         }else{
             return false;
@@ -150,8 +185,21 @@ public class TimerActivity extends Activity implements OnClickListener {
     }
 
     public void changeState(State s){
-    	TextView text = (TextView) findViewById(R.id.textView1);
-    	text.setText(s.toString());
-    	state = s;
+        TextView text = (TextView) findViewById(R.id.textView1);
+        text.setText(s.toString());
+        state = s;
+    }
+
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context,  Intent intent) {
+
+            Bundle bundle = intent.getExtras();
+            String message = bundle.getString("message");
+
+            if(message.equals("expire timer")){
+                expireTimer();
+            }
+        }
     }
 }
